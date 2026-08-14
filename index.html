@@ -26,7 +26,7 @@ body{margin:0;background:linear-gradient(#f2f2f7,#f7f7fa);color:var(--navy);font
 .inputs .row{display:grid;grid-template-columns:1fr 126px;gap:12px;align-items:center;padding:13px 14px;border-bottom:1px solid rgba(60,60,67,.08)}
 .inputs .row:last-child{border-bottom:none}.label{font-weight:650;font-size:15px}.sub{font-size:11px;color:var(--muted);margin-top:2px}
 input{width:100%;border:0;background:#f2f2f7;border-radius:12px;padding:11px 10px;font-size:17px;font-weight:700;color:#007aff;text-align:right;outline:none}
-input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
+input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;background:#f2f2f7;border-radius:12px;padding:11px 10px;font-size:16px;font-weight:750;color:#3a3a3c;text-align:right}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .metric{background:var(--card);border:1px solid rgba(60,60,67,.10);border-radius:18px;padding:13px;min-height:102px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,.035)}
 .metric .k{font-size:10px;font-weight:750;letter-spacing:.045em;color:#8e8e93;text-transform:uppercase}.metric .v{font-size:23px;font-weight:780;letter-spacing:-.025em;line-height:1.05;margin-top:8px}
@@ -48,13 +48,13 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
 <div class="row"><div><div class="label">Entry price</div><div class="sub">USD</div></div><input id="entry" type="number" step="0.01" value="50"></div>
 <div class="row"><div><div class="label">Target price</div><div class="sub">USD</div></div><input id="target" type="number" step="0.01" value="200"></div>
 <div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="5000"></div>
-<div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div>
+<div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div><div class="row readonly-row"><div><div class="label">Approx. stock units</div><div class="sub">Position size ÷ entry price</div></div><div class="readonly-value" id="stockUnits">—</div></div>
 <div class="row"><div><div class="label">Leverage</div><div class="sub">e.g. 5 = 1:5</div></div><input id="leverage" type="number" step="0.1" value="5"></div>
 <div class="row"><div><div class="label">Other existing margin</div><div class="sub">EUR · existing positions</div></div><input id="otherMargin" type="number" step="0.01" value="0"></div>
-<div class="row"><div><div class="label">Overnight holds</div><div class="sub">0 for same-day exit</div></div><input id="nights" type="number" step="1" value="30"></div>
-<div class="row"><div><div class="label">Overnight rate</div><div class="sub">% per night</div></div><input id="overnightRatePct" type="number" step="0.0001" value="0.0724"></div>
+<div class="row"><div><div class="label">Holding period (in days)</div><div class="sub">Estimated holding time</div></div><input id="nights" type="number" step="1" min="0" value="2"></div>
+<div class="row readonly-row"><div><div class="label">Overnight rate</div><div class="sub">Fixed assumption</div></div><div class="readonly-value">0.0724%</div></div>
 <div class="row"><div><div class="label">FX fee</div><div class="sub">% of absolute price P/L</div></div><input id="fxFeePct" type="number" step="0.01" value="0.5"></div>
-<div class="row"><div><div class="label">Dividend adjustment</div><div class="sub">EUR · optional</div></div><input id="dividend" type="number" step="0.01" value="0"></div>
+
 </div></section>
 
 <section class="section"><div class="section-title">OUTCOME</div><div class="grid2">
@@ -66,12 +66,7 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
 <div class="metric"><div class="k">Total target margin</div><div class="v" id="targetMargin">—</div></div>
 </div></section>
 
-<section class="section"><div class="section-title">RETURN AMPLIFICATION</div><div class="grid2">
-<div class="metric" id="stockMoveCard"><div class="k">Stock move</div><div class="v" id="stockMove">—</div></div>
-<div class="metric" id="grossROMCard"><div class="k">Gross return on margin</div><div class="v" id="grossROM">—</div></div>
-<div class="metric" id="netROMCard"><div class="k">Net return on margin</div><div class="v" id="netROM">—</div></div>
-<div class="metric" id="accountRetCard"><div class="k">Net account return</div><div class="v" id="accountRet">—</div></div>
-</div></section>
+<section class="section"><div class="section-title">RETURN AMPLIFICATION</div><div class="grid2"><div class="metric" id="stockMoveCard"><div class="k">Stock move</div><div class="v" id="stockMove">—</div></div><div class="metric" id="netROMCard"><div class="k">Net return on margin</div><div class="v" id="netROM">—</div></div></div></section>
 
 <section class="section"><div class="section-title">RISK & HEALTH</div>
 <div class="card health-card"><div class="health-top"><div><div class="sub">Estimated Health @ target</div><div class="health-num" id="health">—</div></div><div class="badge" id="healthBadge">—</div></div><div class="bar"><div id="healthBar"></div></div><div class="thresholds"><span>25% stop-out</span><span>45% call</span><span>50% caution</span></div></div>
@@ -80,34 +75,134 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
 <div class="metric warn"><div class="k">Price @ 50% Health</div><div class="v" id="price50">—</div></div>
 <div class="metric warn"><div class="k">Drop target → 50%</div><div class="v" id="drop50">—</div></div>
 <div class="metric"><div class="k">Initial margin</div><div class="v" id="initialMargin">—</div></div>
-</div><div class="note">50% Health is used as your personal caution threshold. Live broker Health can differ because prices, FX, financing and margin update continuously.</div>
+</div><div class="note">50% Health is used as your personal caution threshold. Health measures margin utilisation, not P/L. Because margin falls as a long stock position falls in value, Health can sometimes rise during a loss if required margin shrinks faster proportionally than account value. Live broker Health can still differ because prices, FX and margin update continuously.</div>
 </section>
 
 <section class="section"><div class="section-title">SCENARIOS RELATIVE TO ENTRY</div><div class="scenarios" id="scenarios"></div></section>
-<button class="reset" id="resetBtn">Reset example values</button>
+<button class="reset" id="resetBtn">Reset values</button>
 <div class="footer">Planning tool only. Approximate model based on the same formulas used in the companion Excel calculator.</div>
 </div>
 
 <script>
-const ids=["entry","target","account","position","leverage","otherMargin","nights","overnightRatePct","fxFeePct","dividend"];
-const defaults={entry:50,target:200,account:5000,position:2500,leverage:5,otherMargin:0,nights:30,overnightRatePct:0.0724,fxFeePct:0.5,dividend:0};
+const ids=["entry","target","account","position","leverage","otherMargin","nights","fxFeePct"];
+const defaults={entry:50,target:200,account:5000,position:2500,leverage:5,otherMargin:0,nights:2,fxFeePct:0.5};
+
+const OVERNIGHT_RATE=0.000724;
+
 const $=id=>document.getElementById(id), num=id=>parseFloat($(id).value)||0;
 const euro=x=>new Intl.NumberFormat("en-DE",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(x);
 const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(x);
-const pct=x=>`${x>=0?"+":""}${(x*100).toFixed(1)}%`, pctPlain=x=>`${(x*100).toFixed(1)}%`;
-function health(av,m){if(m<=0)return 1;if(av>=m)return Math.max(0,av/(av+m));return Math.max(0,(av/m)*0.5)}
-function read(){return{entry:num("entry"),target:num("target"),account:num("account"),position:num("position"),leverage:num("leverage"),otherMargin:num("otherMargin"),nights:num("nights"),rate:num("overnightRatePct")/100,fx:num("fxFeePct")/100,dividend:num("dividend")}}
-function scenario(price,p){const move=p.entry?price/p.entry-1:0,gross=p.position*move,fxFee=-Math.abs(gross)*p.fx,targetNotional=p.position*(price/p.entry),avg=(p.position+targetNotional)/2,interest=-avg*p.rate*p.nights,net=gross+fxFee+interest+p.dividend,av=p.account+net,margin=targetNotional/p.leverage+p.otherMargin;return{price,move,gross,fxFee,interest,net,av,margin,h:health(av,margin)}}
-function price50(p){const P=p.position,A=p.account,L=p.leverage,M=p.otherMargin,f=p.fx,q=p.rate*p.nights,D=p.dividend;if(!P||!p.entry||!L)return 0;let c=A-P*(1+f)-P*q/2+D-M,k=P*(1+f)-P*q/2-P/L,rd=k?-c/k:NaN;c=A-P*(1-f)-P*q/2+D-M;k=P*(1-f)-P*q/2-P/L;let ru=k?-c/k:NaN,r;if(Number.isFinite(rd)&&rd<=1&&rd>=0)r=rd;else if(Number.isFinite(ru)&&ru>=1)r=ru;else if(Number.isFinite(rd)&&rd>=0)r=rd;else return 0;return p.entry*r}
-function tone(id,v){$(id).classList.remove("good","bad");if(v>0)$(id).classList.add("good");if(v<0)$(id).classList.add("bad")}
-function render(){const p=read(),r=scenario(p.target,p),im=p.leverage?p.position/p.leverage:0,gr=im?r.gross/im:0,nr=im?r.net/im:0,ar=p.account?r.net/p.account:0;
-$("gross").textContent=euro(r.gross);$("fxFee").textContent=euro(r.fxFee);$("interest").textContent=euro(r.interest);$("net").textContent=euro(r.net);$("targetAV").textContent=euro(r.av);$("targetMargin").textContent=euro(r.margin);$("stockMove").textContent=pct(r.move);$("grossROM").textContent=pct(gr);$("netROM").textContent=pct(nr);$("accountRet").textContent=pct(ar);
-tone("grossCard",r.gross);tone("netCard",r.net);tone("stockMoveCard",r.move);tone("grossROMCard",gr);tone("netROMCard",nr);tone("accountRetCard",ar);
-$("health").textContent=pctPlain(r.h);const b=$("healthBadge");b.className="badge";let st,cl,col;if(r.h<=.25){st="STOP-OUT RISK";cl="stop";col="#991b1b"}else if(r.h<=.45){st="MARGIN CALL";cl="margin";col="#dc2626"}else if(r.h<.5){st="CAUTION";cl="caution";col="#ea580c"}else if(r.h<.6){st="WATCH";cl="watch";col="#d97706"}else{st="HEALTHY";cl="healthy";col="#16a34a"}b.textContent=st;b.classList.add(cl);$("healthBar").style.width=`${Math.min(100,r.h*100)}%`;$("healthBar").style.background=col;
-$("freeCash").textContent=euro(Math.max(0,r.av-r.margin));$("initialMargin").textContent=euro(im);const p50=price50(p);$("price50").textContent=p50?usd(p50):"—";$("drop50").textContent=p50&&p.target?pct((p50-p.target)/p.target):"—";
-const moves=[-.4,-.3,-.2,-.1,0,.1,.2,.3,.4];$("scenarios").innerHTML=moves.map(m=>{const x=scenario(p.entry*(1+m),p),hc=x.h<.45?"#dc2626":x.h<.5?"#ea580c":x.h<.6?"#d97706":"#16a34a",pc=x.net<0?"#dc2626":"#16a34a";return `<div class="scenario"><div class="price">${usd(x.price)}</div><div class="mid"><div>${pct(x.move)} vs entry</div><b style="color:${pc}">${euro(x.net)}</b> net</div><div class="health" style="color:${hc}">${pctPlain(x.h)}<div class="sub">Health</div></div></div>`}).join("");
-ids.forEach(id=>localStorage.setItem("cfd_"+id,$(id).value))}
-ids.forEach(id=>{const saved=localStorage.getItem("cfd_"+id);if(saved!==null)$(id).value=saved;$(id).addEventListener("input",render)});
-$("resetBtn").addEventListener("click",()=>{ids.forEach(id=>{$(id).value=defaults[id];localStorage.removeItem("cfd_"+id)});render()});render();
+const units=x=>new Intl.NumberFormat("en-US",{maximumFractionDigits:4}).format(x);
+const pct=x=>`${x>=0?"+":""}${(x*100).toFixed(1)}%`;
+const pctPlain=x=>`${(x*100).toFixed(1)}%`;
 
+function health(accountValue,totalMargin){
+  if(totalMargin<=0) return 1;
+  if(accountValue>=totalMargin) return Math.max(0,accountValue/(accountValue+totalMargin));
+  return Math.max(0,(accountValue/totalMargin)*0.5);
+}
+
+function read(){
+  return{
+    entry:num("entry"),target:num("target"),account:num("account"),position:num("position"),
+    leverage:num("leverage"),otherMargin:num("otherMargin"),
+    nights:num("nights"),rate:OVERNIGHT_RATE,fx:num("fxFeePct")/100
+  };
+}
+
+function scenario(price,p){
+  const move=p.entry?price/p.entry-1:0;
+  const gross=p.position*move;
+  const fxFee=-Math.abs(gross)*p.fx;
+  const targetNotional=p.entry?p.position*(price/p.entry):0;
+  const avgNotional=(p.position+targetNotional)/2;
+  const interest=-avgNotional*p.rate*p.nights;
+  const net=gross+fxFee+interest;
+  const accountValue=p.account+net;
+  const newMargin=p.leverage?targetNotional/p.leverage:0;
+  const totalMargin=newMargin+p.otherMargin;
+  return{price,move,gross,fxFee,interest,net,av:accountValue,margin:totalMargin,h:health(accountValue,totalMargin)};
+}
+
+function price50(p){
+  const P=p.position,A=p.account,L=p.leverage,M=p.otherMargin,f=p.fx,q=p.rate*p.nights;
+  if(!P||!p.entry||!L)return 0;
+  let c=A-P*(1+f)-P*q/2-M, k=P*(1+f)-P*q/2-P/L;
+  const rDown=k?-c/k:NaN;
+  c=A-P*(1-f)-P*q/2-M; k=P*(1-f)-P*q/2-P/L;
+  const rUp=k?-c/k:NaN;
+  let r;
+  if(Number.isFinite(rDown)&&rDown<=1&&rDown>=0) r=rDown;
+  else if(Number.isFinite(rUp)&&rUp>=1) r=rUp;
+  else if(Number.isFinite(rDown)&&rDown>=0) r=rDown;
+  else return 0;
+  return p.entry*r;
+}
+
+function tone(id,v){
+  $(id).classList.remove("good","bad");
+  if(v>0)$(id).classList.add("good");
+  if(v<0)$(id).classList.add("bad");
+}
+
+function render(){
+  const p=read(), r=scenario(p.target,p);
+  const initialMargin=p.leverage?p.position/p.leverage:0;
+  const netROM=initialMargin?r.net/initialMargin:0;
+
+  $("stockUnits").textContent=units(p.entry?p.position/p.entry:0);
+  $("gross").textContent=euro(r.gross);
+  $("fxFee").textContent=euro(r.fxFee);
+  $("interest").textContent=euro(r.interest);
+  $("net").textContent=euro(r.net);
+  $("targetAV").textContent=euro(r.av);
+  $("targetMargin").textContent=euro(r.margin);
+
+  $("stockMove").textContent=pct(r.move);
+  $("netROM").textContent=pct(netROM);
+  tone("grossCard",r.gross);tone("netCard",r.net);
+  tone("stockMoveCard",r.move);tone("netROMCard",netROM);
+
+  $("health").textContent=pctPlain(r.h);
+  const b=$("healthBadge"); b.className="badge";
+  let st,cl,col;
+  if(r.h<=.25){st="STOP-OUT RISK";cl="stop";col="#991b1b"}
+  else if(r.h<=.45){st="MARGIN CALL";cl="margin";col="#dc2626"}
+  else if(r.h<.5){st="CAUTION";cl="caution";col="#ea580c"}
+  else if(r.h<.6){st="WATCH";cl="watch";col="#d97706"}
+  else{st="HEALTHY";cl="healthy";col="#16a34a"}
+  b.textContent=st;b.classList.add(cl);
+  $("healthBar").style.width=`${Math.min(100,r.h*100)}%`;
+  $("healthBar").style.background=col;
+
+  $("freeCash").textContent=euro(Math.max(0,r.av-r.margin));
+  $("initialMargin").textContent=euro(initialMargin);
+  const p50=price50(p);
+  $("price50").textContent=p50?usd(p50):"—";
+  $("drop50").textContent=p50&&p.target?pct((p50-p.target)/p.target):"—";
+
+  const moves=[-.4,-.3,-.2,-.1,0,.1,.2,.3,.4];
+  $("scenarios").innerHTML=moves.map(m=>{
+    const x=scenario(p.entry*(1+m),p);
+    const hc=x.h<.45?"#dc2626":x.h<.5?"#ea580c":x.h<.6?"#d97706":"#16a34a";
+    const pc=x.net<0?"#dc2626":"#16a34a";
+    return `<div class="scenario"><div class="price">${usd(x.price)}</div><div class="mid"><div>${pct(x.move)} vs entry</div><b style="color:${pc}">${euro(x.net)}</b> net</div><div class="health" style="color:${hc}">${pctPlain(x.h)}<div class="sub">Health</div></div></div>`;
+  }).join("");
+
+  ids.forEach(id=>localStorage.setItem("cfd_"+id,$(id).value));
+}
+
+ids.forEach(id=>{
+  const saved=localStorage.getItem("cfd_"+id);
+  if(saved!==null)$(id).value=saved;
+  $(id).addEventListener("input",render);
+});
+
+$("resetBtn").addEventListener("click",()=>{
+  ids.forEach(id=>{$(id).value=defaults[id];localStorage.removeItem("cfd_"+id)});
+  render();
+});
+
+render();
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js").catch(()=>{}));
 </script></body></html>
