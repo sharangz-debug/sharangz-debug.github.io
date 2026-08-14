@@ -1,1 +1,1 @@
-# CFD calculator
+# CFD Risk / Reward Calculator
