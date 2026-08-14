@@ -45,12 +45,12 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
 <header class="hero"><h1>CFD Position Planner</h1><p>iPhone-first finance UI with clean Apple-style cards.</p></header>
 
 <section class="section"><div class="section-title">TRADE SETUP</div><div class="card inputs">
-<div class="row"><div><div class="label">Entry price</div><div class="sub">USD</div></div><input id="entry" type="number" step="0.01" value="210"></div>
-<div class="row"><div><div class="label">Target price</div><div class="sub">USD</div></div><input id="target" type="number" step="0.01" value="250"></div>
-<div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="8105.30"></div>
-<div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="12000"></div>
+<div class="row"><div><div class="label">Entry price</div><div class="sub">USD</div></div><input id="entry" type="number" step="0.01" value="50"></div>
+<div class="row"><div><div class="label">Target price</div><div class="sub">USD</div></div><input id="target" type="number" step="0.01" value="200"></div>
+<div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="5000"></div>
+<div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div>
 <div class="row"><div><div class="label">Leverage</div><div class="sub">e.g. 5 = 1:5</div></div><input id="leverage" type="number" step="0.1" value="5"></div>
-<div class="row"><div><div class="label">Other existing margin</div><div class="sub">EUR · existing positions</div></div><input id="otherMargin" type="number" step="0.01" value="1221.27"></div>
+<div class="row"><div><div class="label">Other existing margin</div><div class="sub">EUR · existing positions</div></div><input id="otherMargin" type="number" step="0.01" value="0"></div>
 <div class="row"><div><div class="label">Overnight holds</div><div class="sub">0 for same-day exit</div></div><input id="nights" type="number" step="1" value="30"></div>
 <div class="row"><div><div class="label">Overnight rate</div><div class="sub">% per night</div></div><input id="overnightRatePct" type="number" step="0.0001" value="0.0724"></div>
 <div class="row"><div><div class="label">FX fee</div><div class="sub">% of absolute price P/L</div></div><input id="fxFeePct" type="number" step="0.01" value="0.5"></div>
@@ -90,7 +90,7 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}
 
 <script>
 const ids=["entry","target","account","position","leverage","otherMargin","nights","overnightRatePct","fxFeePct","dividend"];
-const defaults={entry:210,target:250,account:8105.30,position:12000,leverage:5,otherMargin:1221.27,nights:30,overnightRatePct:0.0724,fxFeePct:0.5,dividend:0};
+const defaults={entry:50,target:200,account:5000,position:2500,leverage:5,otherMargin:0,nights:30,overnightRatePct:0.0724,fxFeePct:0.5,dividend:0};
 const $=id=>document.getElementById(id), num=id=>parseFloat($(id).value)||0;
 const euro=x=>new Intl.NumberFormat("en-DE",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(x);
 const usd=x=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(x);
