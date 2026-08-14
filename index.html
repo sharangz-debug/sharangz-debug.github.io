@@ -78,8 +78,8 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;
 <div class="row"><div><div class="label">Target price</div><div class="sub">USD</div></div><input id="target" type="number" step="0.01" value="200"></div>
 <div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="5000"></div>
 <div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div>
-<div class="row readonly-row"><div><div class="label">EUR/USD conversion</div><div class="sub">Fixed planning assumption</div></div><div class="readonly-value">1 EUR = 1.16 USD</div></div>
-<div class="row readonly-row"><div><div class="label">Approx. stock units</div><div class="sub">EUR position × 1.16 ÷ USD entry</div></div><div class="readonly-value" id="stockUnits">—</div></div>
+<div class="row"><div><div class="label">EUR/USD conversion</div><div class="sub">USD per EUR · planning assumption</div></div><input id="eurUsd" type="number" step="0.0001" min="0.0001" value="1.16"></div>
+<div class="row readonly-row"><div><div class="label">Approx. stock units</div><div class="sub">EUR position × FX rate ÷ USD entry</div></div><div class="readonly-value" id="stockUnits">—</div></div>
 <div class="row readonly-row"><div><div class="label">Leverage</div><div class="sub">Fixed stock CFD assumption</div></div><div class="readonly-value">5× · 20%</div></div>
 <div class="row"><div><div class="label">Current margin from other positions</div><div class="sub">EUR · shown in Trading 212</div></div><input id="otherMargin" type="number" step="0.01" min="0" value="0"></div>
 <div class="row"><div><div class="label">Expected change in other positions’ P/L</div><div class="sub">EUR · future change, positive or negative</div></div><input id="otherPLChange" type="number" step="0.01" value="0"></div>
@@ -113,13 +113,12 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;
 </div>
 
 <script>
-const ids=["entry","target","account","position","otherMargin","otherPLChange","nights"];
-const defaults={entry:50,target:200,account:5000,position:2500,otherMargin:0,otherPLChange:0,nights:2};
+const ids=["entry","target","account","position","eurUsd","otherMargin","otherPLChange","nights"];
+const defaults={entry:50,target:200,account:5000,position:2500,eurUsd:1.16,otherMargin:0,otherPLChange:0,nights:2};
 
 const OVERNIGHT_RATE=0.000724;
 const FX_FEE_RATE=0.005; // fixed 0.5%
 const LEVERAGE=5;
-const EUR_USD_RATE=1.16;
 const DIRECTION_KEY="cfd_direction";
 let tradeDirection=localStorage.getItem(DIRECTION_KEY)==="short"?"short":"long";
 
@@ -150,7 +149,7 @@ function read(){
   return{
     entry:num("entry"),target:num("target"),account:num("account"),position:num("position"),
     leverage:LEVERAGE,otherMargin:num("otherMargin"),otherPLChange:num("otherPLChange"),
-    nights:num("nights"),rate:OVERNIGHT_RATE,fx:FX_FEE_RATE,eurUsd:EUR_USD_RATE,direction:tradeDirection
+    nights:num("nights"),rate:OVERNIGHT_RATE,fx:FX_FEE_RATE,eurUsd:num("eurUsd"),direction:tradeDirection
   };
 }
 
