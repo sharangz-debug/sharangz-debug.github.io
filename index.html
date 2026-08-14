@@ -31,7 +31,7 @@ html[data-theme="dark"]{
 }
 html[data-theme="dark"] body{background:linear-gradient(#000,#111113)}
 html[data-theme="dark"] .hero{background:rgba(28,28,30,.86);color:var(--navy)}
-html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] .readonly-value{background:#2c2c2e;color:#64a9ff}
+html[data-theme="dark"] input,html[data-theme="dark"] .readonly-value{background:#2c2c2e;color:#64a9ff}
 html[data-theme="dark"] .readonly-value{color:#d1d1d6}
 html[data-theme="dark"] .section-title,html[data-theme="dark"] .hero p,html[data-theme="dark"] .metric .k,
 html[data-theme="dark"] .scenario .mid,html[data-theme="dark"] .note{color:#98989d}
@@ -50,10 +50,9 @@ body{margin:0;background:linear-gradient(#f2f2f7,#f7f7fa);color:var(--navy);font
 .inputs .row{display:grid;grid-template-columns:1fr 126px;gap:12px;align-items:center;padding:13px 14px;border-bottom:1px solid rgba(60,60,67,.08)}
 .inputs .row:last-child{border-bottom:none}.label{font-weight:650;font-size:15px}.sub{font-size:11px;color:var(--muted);margin-top:2px}
 input{width:100%;border:0;background:#f2f2f7;border-radius:12px;padding:11px 10px;font-size:17px;font-weight:700;color:#007aff;text-align:right;outline:none}
-select{width:100%;border:0;background:#f2f2f7;border-radius:12px;padding:11px 8px;font-size:15px;font-weight:750;color:#007aff;text-align:right;outline:none}
-input:focus,select:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;background:#f2f2f7;border-radius:12px;padding:11px 10px;font-size:16px;font-weight:750;color:#3a3a3c;text-align:right}
+input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;background:#f2f2f7;border-radius:12px;padding:11px 10px;font-size:16px;font-weight:750;color:#3a3a3c;text-align:right}
 .direction-picker{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px;padding:4px;background:#e5e5ea;border-radius:14px}.direction-btn{border:0;border-radius:11px;padding:10px 12px;background:transparent;color:#636366;font-size:14px;font-weight:750;cursor:pointer;transition:background .18s ease,color .18s ease,transform .12s ease}.direction-btn:active{transform:scale(.98)}.direction-btn:focus-visible{outline:3px solid rgba(0,122,255,.3);outline-offset:1px}.direction-btn[data-direction="long"].active{background:var(--green);color:#fff}.direction-btn[data-direction="short"].active{background:var(--red);color:#fff}html[data-theme="dark"] .direction-picker{background:#2c2c2e}html[data-theme="dark"] .direction-btn{color:#aeaeb2}html[data-theme="dark"] .direction-btn.active{color:#fff}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric.wide{grid-column:1/-1}
 .metric{background:var(--card);border:1px solid rgba(60,60,67,.10);border-radius:18px;padding:13px;min-height:102px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 24px rgba(0,0,0,.035)}
 .metric .k{font-size:10px;font-weight:750;letter-spacing:.045em;color:#8e8e93;text-transform:uppercase}.metric .v{font-size:23px;font-weight:780;letter-spacing:-.025em;line-height:1.05;margin-top:8px}
 .metric.good{background:var(--greenbg)}.metric.good .v{color:var(--green)}.metric.bad{background:var(--redbg)}.metric.bad .v{color:var(--red)}.metric.warn{background:var(--amberbg)}.metric.warn .v{color:var(--amber)}.metric.purple{background:#f5f0ff}
@@ -79,7 +78,7 @@ input:focus,select:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-valu
 <div class="row"><div><div class="label">Target price</div><div class="sub">USD</div></div><input id="target" type="number" step="0.01" value="200"></div>
 <div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="5000"></div>
 <div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div><div class="row readonly-row"><div><div class="label">Approx. stock units</div><div class="sub">Position size ÷ entry price</div></div><div class="readonly-value" id="stockUnits">—</div></div>
-<div class="row"><div><div class="label">Leverage</div><div class="sub">Match the instrument’s margin</div></div><select id="leverage" aria-label="Leverage"><option value="5">5× · 20%</option><option value="10">10× · 10%</option></select></div>
+<div class="row readonly-row"><div><div class="label">Leverage</div><div class="sub">Fixed stock CFD assumption</div></div><div class="readonly-value">5× · 20%</div></div>
 <div class="row"><div><div class="label">Other existing margin</div><div class="sub">EUR · existing positions</div></div><input id="otherMargin" type="number" step="0.01" value="0"></div>
 <div class="row"><div><div class="label">Holding period (in days)</div><div class="sub">Estimated holding time</div></div><input id="nights" type="number" step="1" min="0" value="2"></div>
 <div class="row readonly-row"><div><div class="label">Overnight rate</div><div class="sub">Same estimate for long & short</div></div><div class="readonly-value">0.0724%</div></div>
@@ -92,8 +91,7 @@ input:focus,select:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-valu
 <div class="metric purple"><div class="k">Estimated FX fee</div><div class="v" id="fxFee">—</div></div>
 <div class="metric purple"><div class="k">Overnight interest</div><div class="v" id="interest">—</div></div>
 <div class="metric" id="netCard"><div class="k">Net result</div><div class="v" id="net">—</div></div>
-<div class="metric"><div class="k">Target account value</div><div class="v" id="targetAV">—</div></div>
-<div class="metric"><div class="k">Total target margin</div><div class="v" id="targetMargin">—</div></div>
+<div class="metric wide"><div class="k">Target account value</div><div class="v" id="targetAV">—</div></div>
 </div></section>
 
 <section class="section"><div class="section-title">RETURN AMPLIFICATION</div><div class="grid2"><div class="metric" id="stockMoveCard"><div class="k">Stock move</div><div class="v" id="stockMove">—</div></div><div class="metric" id="netROMCard"><div class="k">Net return on margin</div><div class="v" id="netROM">—</div></div></div></section>
@@ -101,10 +99,8 @@ input:focus,select:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-valu
 <section class="section"><div class="section-title">RISK & HEALTH</div>
 <div class="card health-card"><div class="health-top"><div><div class="sub">Estimated Health @ target</div><div class="health-num" id="health">—</div></div><div class="badge" id="healthBadge">—</div></div><div class="bar"><div id="healthBar"></div></div><div class="thresholds"><span>25% stop-out</span><span>45% call</span><span>50% caution</span></div></div>
 <div class="grid2" style="margin-top:10px">
-<div class="metric"><div class="k">Free cash @ target</div><div class="v" id="freeCash">—</div></div>
-<div class="metric warn"><div class="k">Price @ 50% Health</div><div class="v" id="price50">—</div></div>
-<div class="metric warn"><div class="k">Move target → 50%</div><div class="v" id="drop50">—</div></div>
-<div class="metric"><div class="k">Initial margin</div><div class="v" id="initialMargin">—</div></div>
+<div class="metric"><div class="k">Cash @ target</div><div class="v" id="cashTarget">—</div></div>
+<div class="metric"><div class="k">Margin @ target</div><div class="v" id="marginTarget">—</div></div>
 </div><div class="note">50% Health is used as your personal caution threshold. Health measures margin utilisation, not P/L. Because margin falls as a long stock position falls in value, Health can sometimes rise during a loss if required margin shrinks faster proportionally than account value. Live broker Health can still differ because prices, FX and margin update continuously.</div>
 </section>
 
@@ -114,11 +110,12 @@ input:focus,select:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-valu
 </div>
 
 <script>
-const ids=["entry","target","account","position","leverage","otherMargin","nights"];
-const defaults={entry:50,target:200,account:5000,position:2500,leverage:5,otherMargin:0,nights:2};
+const ids=["entry","target","account","position","otherMargin","nights"];
+const defaults={entry:50,target:200,account:5000,position:2500,otherMargin:0,nights:2};
 
 const OVERNIGHT_RATE=0.000724;
 const FX_FEE_RATE=0.005; // fixed 0.5%
+const LEVERAGE=5;
 const DIRECTION_KEY="cfd_direction";
 let tradeDirection=localStorage.getItem(DIRECTION_KEY)==="short"?"short":"long";
 
@@ -148,7 +145,7 @@ function health(accountValue,totalMargin){
 function read(){
   return{
     entry:num("entry"),target:num("target"),account:num("account"),position:num("position"),
-    leverage:num("leverage"),otherMargin:num("otherMargin"),
+    leverage:LEVERAGE,otherMargin:num("otherMargin"),
     nights:num("nights"),rate:OVERNIGHT_RATE,fx:FX_FEE_RATE,direction:tradeDirection
   };
 }
@@ -166,22 +163,6 @@ function scenario(price,p){
   const newMargin=p.leverage?targetNotional/p.leverage:0;
   const totalMargin=newMargin+p.otherMargin;
   return{price,move,gross,fxFee,interest,net,av:accountValue,margin:totalMargin,h:health(accountValue,totalMargin)};
-}
-
-function price50(p){
-  const P=p.position,A=p.account,L=p.leverage,M=p.otherMargin,f=p.fx,q=p.rate*p.nights;
-  const d=p.direction==="short"?-1:1;
-  if(!P||!p.entry||!L)return 0;
-  let c=A-d*P-P*f-P*q/2-M, k=d*P+P*f-P*q/2-P/L;
-  const rDown=k?-c/k:NaN;
-  c=A-d*P+P*f-P*q/2-M; k=d*P-P*f-P*q/2-P/L;
-  const rUp=k?-c/k:NaN;
-  const downValid=Number.isFinite(rDown)&&rDown>=0&&rDown<=1;
-  const upValid=Number.isFinite(rUp)&&rUp>=1;
-  let r;
-  if(d===1) r=downValid?rDown:(upValid?rUp:NaN);
-  else r=upValid?rUp:(downValid?rDown:NaN);
-  return Number.isFinite(r)?p.entry*r:0;
 }
 
 function setDirection(direction,shouldRender=true){
@@ -213,7 +194,6 @@ function render(){
   $("interest").textContent=euro(r.interest);
   $("net").textContent=euro(r.net);
   $("targetAV").textContent=euro(r.av);
-  $("targetMargin").textContent=euro(r.margin);
 
   $("stockMove").textContent=pct(r.move);
   $("netROM").textContent=pct(netROM);
@@ -232,11 +212,8 @@ function render(){
   $("healthBar").style.width=`${Math.min(100,r.h*100)}%`;
   $("healthBar").style.background=col;
 
-  $("freeCash").textContent=euro(Math.max(0,r.av-r.margin));
-  $("initialMargin").textContent=euro(initialMargin);
-  const p50=price50(p);
-  $("price50").textContent=p50?usd(p50):"—";
-  $("drop50").textContent=p50&&p.target?pct((p50-p.target)/p.target):"—";
+  $("cashTarget").textContent=euro(Math.max(0,r.av-r.margin));
+  $("marginTarget").textContent=euro(r.margin);
 
   const moves=[-.4,-.3,-.2,-.1,0,.1,.2,.3,.4];
   $("scenarios").innerHTML=moves.map(m=>{
@@ -251,9 +228,7 @@ function render(){
 
 ids.forEach(id=>{
   const saved=localStorage.getItem("cfd_"+id);
-  const validSaved=id!=="leverage"||saved===null||["5","10"].includes(saved);
-  if(saved!==null&&validSaved)$(id).value=saved;
-  if(id==="leverage"&&!validSaved)localStorage.removeItem("cfd_"+id);
+  if(saved!==null)$(id).value=saved;
   $(id).addEventListener("input",render);
 });
 
