@@ -79,7 +79,8 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;
 <div class="row"><div><div class="label">Starting account value</div><div class="sub">EUR · before new trade</div></div><input id="account" type="number" step="0.01" value="5000"></div>
 <div class="row"><div><div class="label">Position size at entry</div><div class="sub">EUR notional</div></div><input id="position" type="number" step="0.01" value="2500"></div><div class="row readonly-row"><div><div class="label">Approx. stock units</div><div class="sub">Position size ÷ entry price</div></div><div class="readonly-value" id="stockUnits">—</div></div>
 <div class="row readonly-row"><div><div class="label">Leverage</div><div class="sub">Fixed stock CFD assumption</div></div><div class="readonly-value">5× · 20%</div></div>
-<div class="row"><div><div class="label">Other existing margin</div><div class="sub">EUR · existing positions</div></div><input id="otherMargin" type="number" step="0.01" value="0"></div>
+<div class="row"><div><div class="label">Current margin from other positions</div><div class="sub">EUR · shown in Trading 212</div></div><input id="otherMargin" type="number" step="0.01" min="0" value="0"></div>
+<div class="row"><div><div class="label">Expected change in other positions’ P/L</div><div class="sub">EUR · future change, positive or negative</div></div><input id="otherPLChange" type="number" step="0.01" value="0"></div>
 <div class="row"><div><div class="label">Holding period (in days)</div><div class="sub">Estimated holding time</div></div><input id="nights" type="number" step="1" min="0" value="2"></div>
 <div class="row readonly-row"><div><div class="label">Overnight rate</div><div class="sub">Same estimate for long & short</div></div><div class="readonly-value">0.0724%</div></div>
 <div class="row readonly-row"><div><div class="label">FX fee</div><div class="sub">Fixed assumption</div></div><div class="readonly-value">0.5%</div></div>
@@ -101,7 +102,7 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;
 <div class="grid2" style="margin-top:10px">
 <div class="metric"><div class="k">Cash @ target</div><div class="v" id="cashTarget">—</div></div>
 <div class="metric"><div class="k">Margin @ target</div><div class="v" id="marginTarget">—</div></div>
-</div><div class="note">50% Health is used as your personal caution threshold. Health measures margin utilisation, not P/L. Because margin falls as a long stock position falls in value, Health can sometimes rise during a loss if required margin shrinks faster proportionally than account value. Live broker Health can still differ because prices, FX and margin update continuously.</div>
+</div><div class="note">50% Health is used as your personal caution threshold. Health measures margin utilisation, not P/L. Because margin falls as a long stock position falls in value, Health can sometimes rise during a loss if required margin shrinks faster proportionally than account value. Other positions’ margin is held constant, while their expected P/L change is applied to account value. Live broker Health can still differ because prices, FX and margin update continuously.</div>
 </section>
 
 <section class="section"><div class="section-title">SCENARIOS RELATIVE TO ENTRY</div><div class="scenarios" id="scenarios"></div></section>
@@ -110,8 +111,8 @@ input:focus{box-shadow:0 0 0 3px rgba(0,122,255,.12)}.readonly-value{width:100%;
 </div>
 
 <script>
-const ids=["entry","target","account","position","otherMargin","nights"];
-const defaults={entry:50,target:200,account:5000,position:2500,otherMargin:0,nights:2};
+const ids=["entry","target","account","position","otherMargin","otherPLChange","nights"];
+const defaults={entry:50,target:200,account:5000,position:2500,otherMargin:0,otherPLChange:0,nights:2};
 
 const OVERNIGHT_RATE=0.000724;
 const FX_FEE_RATE=0.005; // fixed 0.5%
@@ -145,7 +146,7 @@ function health(accountValue,totalMargin){
 function read(){
   return{
     entry:num("entry"),target:num("target"),account:num("account"),position:num("position"),
-    leverage:LEVERAGE,otherMargin:num("otherMargin"),
+    leverage:LEVERAGE,otherMargin:num("otherMargin"),otherPLChange:num("otherPLChange"),
     nights:num("nights"),rate:OVERNIGHT_RATE,fx:FX_FEE_RATE,direction:tradeDirection
   };
 }
@@ -159,7 +160,7 @@ function scenario(price,p){
   const avgNotional=(p.position+targetNotional)/2;
   const interest=-avgNotional*p.rate*p.nights;
   const net=gross+fxFee+interest;
-  const accountValue=p.account+net;
+  const accountValue=p.account+net+p.otherPLChange;
   const newMargin=p.leverage?targetNotional/p.leverage:0;
   const totalMargin=newMargin+p.otherMargin;
   return{price,move,gross,fxFee,interest,net,av:accountValue,margin:totalMargin,h:health(accountValue,totalMargin)};
